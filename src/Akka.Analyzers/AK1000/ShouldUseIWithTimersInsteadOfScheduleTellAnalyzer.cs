@@ -4,6 +4,7 @@
 //  </copyright>
 // -----------------------------------------------------------------------
 
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -29,10 +30,13 @@ public class ShouldUseIWithTimersInsteadOfScheduleTellAnalyzer(): AkkaDiagnostic
             
             var semanticModel = ctx.SemanticModel;
             // Get the member symbol from the invocation expression
-            var memberSymbol = semanticModel.GetSymbolInfo(memberAccessExpr).Symbol;
+            if(semanticModel.GetSymbolInfo(memberAccessExpr).Symbol is not IMethodSymbol methodSymbol)
+                return;
             
             // Check if the method name is `ScheduleTellOnce` or `ScheduleTellRepeatedly`
-            if (memberSymbol is null || (memberSymbol.Name is not "ScheduleTellOnce" && memberSymbol.Name is not "ScheduleTellRepeatedly"))
+            var refSymbols = akkaContext.AkkaCore.Actor.ITellScheduler.ScheduleTellOnce
+                .AddRange(akkaContext.AkkaCore.Actor.ITellScheduler.ScheduleTellRepeatedly);
+            if(!refSymbols.Any(s => ReferenceEquals(methodSymbol, s)))
                 return;
             
             var classDeclaration = invocationExpr.Ancestors().OfType<ClassDeclarationSyntax>().FirstOrDefault();
@@ -40,26 +44,9 @@ public class ShouldUseIWithTimersInsteadOfScheduleTellAnalyzer(): AkkaDiagnostic
                 return;
             
             var classBase = semanticModel.GetDeclaredSymbol(classDeclaration)?.BaseType;
-
             var coreContext = akkaContext.AkkaCore;
             // Check that the class declaration inherits from ActorBase
             if (classBase is null || !classBase.IsDerivedOrImplements(coreContext.Actor.ActorBaseType!))
-                return;
-            
-            // Member access is accessing something that needs to derive from ITellScheduler
-            var symbol = semanticModel.GetSymbolInfo(memberAccessExpr.Expression).Symbol;
-            var type = symbol switch
-            {
-                IPropertySymbol p => p.Type,
-                IFieldSymbol f => f.Type,
-                ILocalSymbol l => l.Type,
-                IParameterSymbol p => p.Type,
-                IMethodSymbol m => m.ReturnType,
-                _ => null
-            };
-            
-            if(type is null || type.AllInterfaces.All(i => 
-                   !SymbolEqualityComparer.Default.Equals(i, coreContext.Actor.TellSchedulerInterface)))
                 return;
             
             ReportDiagnostic();

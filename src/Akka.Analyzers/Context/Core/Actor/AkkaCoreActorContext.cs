@@ -19,7 +19,8 @@ public sealed class EmptyAkkaCoreActorContext : IAkkaCoreActorContext
     public INamedTypeSymbol? IndirectActorProducerInterface => null;
     public INamedTypeSymbol? ReceiveActorType => null;
     public INamedTypeSymbol? GracefulStopSupportType => null;
-    public INamedTypeSymbol? TellSchedulerInterface => null;
+    public INamedTypeSymbol? ITellSchedulerType => null;
+    public ITellSchedulerInterfaceContext ITellScheduler => EmptyTellSchedulerInterfaceContext.Instance;
 }
 
 public sealed class AkkaCoreActorContext : IAkkaCoreActorContext
@@ -43,6 +44,7 @@ public sealed class AkkaCoreActorContext : IAkkaCoreActorContext
         _lazyReceiveActorType = new Lazy<INamedTypeSymbol?>(() => ActorSymbolFactory.ReceiveActor(compilation));
         _lazyGracefulStopSupport = new Lazy<INamedTypeSymbol?>(() => ActorSymbolFactory.GracefulStopSupport(compilation));
         _lazyTellSchedulerInterface = new Lazy<INamedTypeSymbol?>(() => ActorSymbolFactory.TellSchedulerInterface(compilation));
+        ITellScheduler = TellSchedulerInterfaceContext.Get(compilation);
     }
 
     public INamedTypeSymbol? ActorBaseType => _lazyActorBaseType.Value;
@@ -52,8 +54,8 @@ public sealed class AkkaCoreActorContext : IAkkaCoreActorContext
     public INamedTypeSymbol? IndirectActorProducerInterface => _lazyIIndirectActorProducerType.Value;
     public INamedTypeSymbol? ReceiveActorType => _lazyReceiveActorType.Value;
     public INamedTypeSymbol? GracefulStopSupportType => _lazyGracefulStopSupport.Value;
-    public INamedTypeSymbol? TellSchedulerInterface => _lazyTellSchedulerInterface.Value;
-
+    public INamedTypeSymbol? ITellSchedulerType => _lazyTellSchedulerInterface.Value;
+    public ITellSchedulerInterfaceContext ITellScheduler { get; }
     public static IAkkaCoreActorContext Get(Compilation compilation)
         => new AkkaCoreActorContext(compilation);
 }

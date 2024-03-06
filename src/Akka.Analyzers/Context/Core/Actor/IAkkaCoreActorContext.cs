@@ -17,5 +17,7 @@ public interface IAkkaCoreActorContext
     public INamedTypeSymbol? IndirectActorProducerInterface { get; }
     public INamedTypeSymbol? ReceiveActorType { get; }
     public INamedTypeSymbol? GracefulStopSupportType { get; }
-    public INamedTypeSymbol? TellSchedulerInterface { get; }
+    public INamedTypeSymbol? ITellSchedulerType { get; }
+    
+    public ITellSchedulerInterfaceContext ITellScheduler { get; }
 }
