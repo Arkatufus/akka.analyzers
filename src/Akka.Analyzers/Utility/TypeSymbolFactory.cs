@@ -97,4 +97,8 @@ public static class TypeSymbolFactory
     public static INamedTypeSymbol? GracefulStopSupport(Compilation compilation)
         => Guard.AssertIsNotNull(compilation)
             .GetTypeByMetadataName("Akka.Actor.GracefulStopSupport");
+    
+    public static INamedTypeSymbol? TellSchedulerInterface(Compilation compilation)
+        => Guard.AssertIsNotNull(compilation)
+            .GetTypeByMetadataName("Akka.Actor.ITellScheduler");
 }

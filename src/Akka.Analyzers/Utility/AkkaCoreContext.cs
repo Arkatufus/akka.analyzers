@@ -27,6 +27,7 @@ public interface IAkkaCoreContext
     public INamedTypeSymbol? IndirectActorProducerType { get; }
     public INamedTypeSymbol? ReceiveActorType { get; }
     public INamedTypeSymbol? GracefulStopSupportType { get; }
+    public INamedTypeSymbol? TellSchedulerInterface { get; }
 }
 
 /// <summary>
@@ -52,6 +53,8 @@ public sealed class EmptyCoreContext : IAkkaCoreContext
     public INamedTypeSymbol? ReceiveActorType => null;
     
     public INamedTypeSymbol? GracefulStopSupportType => null;
+    
+    public INamedTypeSymbol? TellSchedulerInterface => null;
 }
 
 /// <summary>
@@ -70,6 +73,7 @@ public class AkkaCoreContext : IAkkaCoreContext
     private readonly Lazy<INamedTypeSymbol?> _lazyIIndirectActorProducerType;
     private readonly Lazy<INamedTypeSymbol?> _lazyReceiveActorType;
     private readonly Lazy<INamedTypeSymbol?> _lazyGracefulStopSupport;
+    private readonly Lazy<INamedTypeSymbol?> _lazyTellSchedulerInterface;
 
     private AkkaCoreContext(Compilation compilation, Version version)
     {
@@ -81,6 +85,7 @@ public class AkkaCoreContext : IAkkaCoreContext
         _lazyIIndirectActorProducerType = new Lazy<INamedTypeSymbol?>(() => TypeSymbolFactory.IndirectActorProducer(compilation));
         _lazyReceiveActorType = new Lazy<INamedTypeSymbol?>(() => TypeSymbolFactory.ReceiveActor(compilation));
         _lazyGracefulStopSupport = new Lazy<INamedTypeSymbol?>(() => TypeSymbolFactory.GracefulStopSupport(compilation));
+        _lazyTellSchedulerInterface = new Lazy<INamedTypeSymbol?>(() => TypeSymbolFactory.TellSchedulerInterface(compilation));
     }
 
     /// <inheritdoc />
@@ -97,6 +102,8 @@ public class AkkaCoreContext : IAkkaCoreContext
     public INamedTypeSymbol? ReceiveActorType => _lazyReceiveActorType.Value;
 
     public INamedTypeSymbol? GracefulStopSupportType => _lazyGracefulStopSupport.Value;
+    
+    public INamedTypeSymbol? TellSchedulerInterface => _lazyTellSchedulerInterface.Value;
     
     public static AkkaCoreContext? Get(
         Compilation compilation,
