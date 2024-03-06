@@ -40,9 +40,10 @@ public class ShouldUseIWithTimersInsteadOfScheduleTellAnalyzer(): AkkaDiagnostic
                 return;
             
             var classBase = semanticModel.GetDeclaredSymbol(classDeclaration)?.BaseType;
-            
+
+            var coreContext = akkaContext.AkkaCore;
             // Check that the class declaration inherits from ActorBase
-            if (classBase is null || !classBase.IsDerivedOrImplements(akkaContext.AkkaCore.ActorBaseType!))
+            if (classBase is null || !classBase.IsDerivedOrImplements(coreContext.Actor.ActorBaseType!))
                 return;
             
             // Member access is accessing something that needs to derive from ITellScheduler
@@ -58,7 +59,7 @@ public class ShouldUseIWithTimersInsteadOfScheduleTellAnalyzer(): AkkaDiagnostic
             };
             
             if(type is null || type.AllInterfaces.All(i => 
-                   !SymbolEqualityComparer.Default.Equals(i, akkaContext.AkkaCore.TellSchedulerInterface)))
+                   !SymbolEqualityComparer.Default.Equals(i, coreContext.Actor.TellSchedulerInterface)))
                 return;
             
             ReportDiagnostic();
