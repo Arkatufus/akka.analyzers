@@ -50,6 +50,15 @@ public static class RuleDescriptors
         messageFormat: "ReceiveAsync<T>() or ReceiveAnyAsync() message handler with synchronous code body or " +
                        "block is less performant compared to Receive<T>() or ReceiveAny(). " +
                        "Consider changing this message handler to Receive<T>() or ReceiveAny() instead.");
+    
+    public static DiagnosticDescriptor Ak1005MustCloseOverSenderWhenUsingReceiveAsync { get; } = Rule(
+        id: "AK1005",
+        title: "Should always close over `Sender` inside `ReceiveAsync<T>()` or `ReceiveAnyAsync()` message handler", 
+        category: AnalysisCategory.ActorDesign, 
+        defaultSeverity: DiagnosticSeverity.Error,
+        messageFormat: "When using `ReceiveAsync<T>()` or `ReceiveAnyAsync()` message handler, you must always close " +
+                       "over `Sender` to ensure that the actor's `Sender` property is captured at the time of message " +
+                       "handler execution, as this value may change asynchronously.");
     #endregion
     
     #region AK2000 Rules
