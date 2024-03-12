@@ -99,15 +99,6 @@ internal static class CodeAnalysisExtensions
         return false;
     }
     
-    public static bool IsAccessingActorSenderProperty(
-        this MemberAccessExpressionSyntax memberAccess,
-        SemanticModel semanticModel,
-        IAkkaCoreContext akkaContext)
-    {
-        return IsAccessingActorBaseSender(memberAccess, semanticModel, akkaContext) ||
-               IsAccessingActorContextSender(memberAccess, semanticModel, akkaContext);
-    }
-    
     public static bool IsAccessingActorSelf(
         this InvocationExpressionSyntax invocationExpression,
         SemanticModel semanticModel,
@@ -121,51 +112,19 @@ internal static class CodeAnalysisExtensions
                IsAccessingActorContextSelf(memberAccess, semanticModel, akkaContext);
     }
     
-    private static bool IsAccessingActorBaseSender(
-        MemberAccessExpressionSyntax memberAccess,
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsActorSenderIdentifier(
+        this IdentifierNameSyntax identifier,
         SemanticModel semanticModel,
         IAkkaCoreContext akkaContext)
     {
-        // Method accesses an identifier
-        if (memberAccess.Expression is not IdentifierNameSyntax identifier) 
-            return false;
-        
         // Make sure that identifier is a property
         if (semanticModel.GetSymbolInfo(identifier).Symbol is not IPropertySymbol propertySymbol)
             return false;
-
-        // Property is equal to `ActorBase.Sender`
-        var refSymbol = akkaContext.Actor.ActorBase.Sender;
-        if (SymbolEqualityComparer.Default.Equals(refSymbol, propertySymbol))
-            return true;
-        return false;
-    }
-
-    private static bool IsAccessingActorContextSender(
-        MemberAccessExpressionSyntax memberAccess,
-        SemanticModel semanticModel,
-        IAkkaCoreContext akkaContext)
-    {
-        // The object being accessed by the invocation needs to be a member access itself
-        if (memberAccess.Expression is not MemberAccessExpressionSyntax selfMemberAccess)
-            return false;
         
-        // Member access needs to be called "Sender"
-        var refSymbol = akkaContext.Actor.IActorContext.Sender!;
-        if (selfMemberAccess.Name.Identifier.Text != refSymbol.Name)
-            return false;
-        
-        // Self member access is accessing something that needs to derive from IActorContext
-        var symbol = semanticModel.GetSymbolInfo(selfMemberAccess.Expression).Symbol;
-        return symbol switch
-        {
-            IPropertySymbol p => p.Type.IsDerivedOrImplements(akkaContext.Actor.IActorContextType!),
-            IFieldSymbol f => f.Type.IsDerivedOrImplements(akkaContext.Actor.IActorContextType!),
-            ILocalSymbol l => l.Type.IsDerivedOrImplements(akkaContext.Actor.IActorContextType!),
-            IParameterSymbol p => p.Type.IsDerivedOrImplements(akkaContext.Actor.IActorContextType!),
-            IMethodSymbol m => m.ReturnType.IsDerivedOrImplements(akkaContext.Actor.IActorContextType!),
-            _ => false
-        };
+        // Property is equal to `ActorBase.Sender` or `IActorContext.Sender`
+        return ReferenceEquals(akkaContext.Actor.ActorBase.Sender, propertySymbol) ||
+               ReferenceEquals(akkaContext.Actor.IActorContext.Sender, propertySymbol);
     }
     
     private static bool IsAccessingActorBaseSelf(

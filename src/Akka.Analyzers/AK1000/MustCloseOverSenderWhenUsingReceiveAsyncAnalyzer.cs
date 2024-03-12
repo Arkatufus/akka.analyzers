@@ -4,6 +4,8 @@
 //  </copyright>
 // -----------------------------------------------------------------------
 
+using System.Collections.Immutable;
+using System.Linq.Expressions;
 using Akka.Analyzers.Context;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -23,29 +25,46 @@ public class MustCloseOverSenderWhenUsingReceiveAsyncAnalyzer()
 
         context.RegisterSyntaxNodeAction(ctx =>
         {
-            var memberAccessExpr = (MemberAccessExpressionSyntax)ctx.Node;
+            var invocationExpr = (InvocationExpressionSyntax)ctx.Node;
             var semanticModel = ctx.SemanticModel;
+            var akkaCore = akkaContext.AkkaCore;
             
-            // Check if it is a `Sender` property access
-            if(!memberAccessExpr.IsAccessingActorSenderProperty(semanticModel, akkaContext.AkkaCore))
-                return;
-
-            // Check if it's a ReceiveAsync<T>() or ReceiveAnyAsync() method call
-            if (!invocationExpr.IsReceiveAsyncInvocation(semanticModel, akkaContext.AkkaCore))
+            // We're only interested in ReceiveAsync<T>() and ReceiveAnyAsync() invocation
+            if (!invocationExpr.IsReceiveAsyncInvocation(semanticModel, akkaCore))
                 return;
             
-            // Check if 'this.Sender' is used in the arguments
-            foreach (var arg in invocationExpr.ArgumentList.Arguments)
-            {
-                var symbol = ModelExtensions.GetSymbolInfo(ctx.SemanticModel, arg.Expression).Symbol;
-                if (IsThisSenderSymbol(symbol, akkaContext))
+            // Get the lambda argument expression
+            var lambdaExpression = invocationExpr.ArgumentList.Arguments
+                .Where(arg =>
                 {
-                    var diagnostic = Diagnostic.Create(RuleDescriptors.Ak1001CloseOverSenderUsingPipeTo,
-                        memberAccessExpr.Name.GetLocation());
-                    ctx.ReportDiagnostic(diagnostic);
-                    break; // Report only once per invocation
-                }
+                    if (arg.Expression is not LambdaExpressionSyntax lambdaExpr)
+                        return false;
+
+                    // Detect the argument that conforms to `Func<T, Task>` pattern
+                    var typeInfo = semanticModel.GetTypeInfo(lambdaExpr);
+                    return typeInfo.ConvertedType is INamedTypeSymbol { 
+                        DelegateInvokeMethod: { 
+                            ReturnType: INamedTypeSymbol { Name: "Task" },
+                            Parameters.Length: 1
+                        }
+                    };
+                }).FirstOrDefault();
+            if(lambdaExpression is null)
+                return;
+            
+            // Find any "Sender" declaration inside the lambda function and it is not a variable initializer
+            var senders = lambdaExpression.DescendantNodes().OfType<IdentifierNameSyntax>();
+            foreach (var sender in senders)
+            {
+                if (!sender.IsActorSenderIdentifier(semanticModel, akkaCore) ||
+                    sender.Parent?.Parent is VariableDeclaratorSyntax) 
+                    continue;
+                
+                var diagnostic = Diagnostic.Create(RuleDescriptors.Ak1005MustCloseOverSenderWhenUsingReceiveAsync,
+                    sender.GetLocation());
+                ctx.ReportDiagnostic(diagnostic);
+                break; // Report only once per invocation
             }
-        }, SyntaxKind.SimpleMemberAccessExpression);
+        }, SyntaxKind.InvocationExpression);
     }
 }
