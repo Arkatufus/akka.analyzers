@@ -51,6 +51,17 @@ public static class RuleDescriptors
                        "block is less performant compared to Receive<T>() or ReceiveAny(). " +
                        "Consider changing this message handler to Receive<T>() or ReceiveAny() instead.");
     
+    public static DiagnosticDescriptor Ak1004ShouldUseIWithTimersInsteadOfScheduleTell { get; } = Rule(
+        id: "AK1004",
+        title: "ScheduleTellOnce() and ScheduleTellRepeatedly() can cause memory leak if not properly canceled", 
+        category: AnalysisCategory.ActorDesign, 
+        defaultSeverity: DiagnosticSeverity.Warning,
+        messageFormat: "Usage of ScheduleTellOnce() and ScheduleTellRepeatedly() inside an Akka actor, " +
+                       "especially the variant that does not accept an ICancelable parameter, " +
+                       "can cause memory leak and unnecessary CPU usage if they are not canceled properly inside PostStop(). " +
+                       "Consider implementing the IWithTimers interface and use the Timers.StartSingleTimer() or " +
+                       "Timers.StartPeriodicTimer() instead.");
+
     public static DiagnosticDescriptor Ak1005MustCloseOverSenderWhenUsingReceiveAsync { get; } = Rule(
         id: "AK1005",
         title: "Should always close over `Sender` inside `ReceiveAsync<T>()` or `ReceiveAnyAsync()` message handler", 
@@ -59,6 +70,14 @@ public static class RuleDescriptors
         messageFormat: "When using `ReceiveAsync<T>()` or `ReceiveAnyAsync()` message handler, you must always close " +
                        "over `Sender` to ensure that the actor's `Sender` property is captured at the time of message " +
                        "handler execution, as this value may change asynchronously.");
+    
+    public static DiagnosticDescriptor Ak1007MustNotUseIWithTimersInPreRestart { get; } = Rule(
+        id: "AK1007",
+        title: "Timers.StartSingleTimer() and Timers.StartPeriodicTimer() must not be used inside AroundPreRestart() or PreRestart()", 
+        category: AnalysisCategory.ActorDesign, 
+        defaultSeverity: DiagnosticSeverity.Error,
+        messageFormat: "Creating timer registration using `{0}()` in `{1}()` will not be honored because they will be " +
+                       "cleared immediately. Move timer creation to `PostRestart()` instead.");
     #endregion
     
     #region AK2000 Rules
