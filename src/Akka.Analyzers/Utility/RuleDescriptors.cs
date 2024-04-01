@@ -66,7 +66,7 @@ public static class RuleDescriptors
         id: "AK1005",
         title: "Must close over `Sender` or `Self`", 
         category: AnalysisCategory.ActorDesign, 
-        defaultSeverity: DiagnosticSeverity.Error,
+        defaultSeverity: DiagnosticSeverity.Warning,
         messageFormat: "When accessing `{0}` inside a lambda expression passed as an asynchronous method argument, " +
                        "you must always close over `{0}` to ensure that the `{0}` property is captured before the " +
                        "method is invoked, because there is no guarantee that asynchronous context will be preserved " +
