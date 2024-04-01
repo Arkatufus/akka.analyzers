@@ -655,7 +655,7 @@ public sealed class MyActor : ReceiveActor
     {
         var expected = Verify.Diagnostic()
             .WithSpan(d.spanData.startLine, d.spanData.startColumn, d.spanData.endLine, d.spanData.endColumn)
-            .WithSeverity(DiagnosticSeverity.Error)
+            .WithSeverity(DiagnosticSeverity.Warning)
             .WithArguments(d.arg);
 
         return Verify.VerifyAnalyzer([d.testCode, ThirdPartyApiClass, MessageClass], expected);
