@@ -62,14 +62,15 @@ public static class RuleDescriptors
                        "Consider implementing the IWithTimers interface and use the Timers.StartSingleTimer() or " +
                        "Timers.StartPeriodicTimer() instead.");
 
-    public static DiagnosticDescriptor Ak1005MustCloseOverSenderWhenUsingReceiveAsync { get; } = Rule(
+    public static DiagnosticDescriptor Ak1005MustCloseOverSenderWhenUsedInsideLambdaArgument { get; } = Rule(
         id: "AK1005",
-        title: "Should always close over `Sender` inside `ReceiveAsync<T>()` or `ReceiveAnyAsync()` message handler", 
+        title: "Must close over `Sender` or `Self`", 
         category: AnalysisCategory.ActorDesign, 
         defaultSeverity: DiagnosticSeverity.Error,
-        messageFormat: "When using `ReceiveAsync<T>()` or `ReceiveAnyAsync()` message handler, you must always close " +
-                       "over `Sender` to ensure that the actor's `Sender` property is captured at the time of message " +
-                       "handler execution, as this value may change asynchronously.");
+        messageFormat: "When accessing `{0}` inside a lambda expression passed as an asynchronous method argument, " +
+                       "you must always close over `{0}` to ensure that the `{0}` property is captured before the " +
+                       "method is invoked, because there is no guarantee that asynchronous context will be preserved " +
+                       "when the lambda is invoked inside the method.");
     
     public static DiagnosticDescriptor Ak1007MustNotUseIWithTimersInPreRestart { get; } = Rule(
         id: "AK1007",
