@@ -14,6 +14,7 @@ public interface IActorBaseContext
     #region Properties
 
     public IPropertySymbol? Self { get; }
+    public IPropertySymbol? Sender { get; }
 
     #endregion
 
@@ -36,6 +37,7 @@ public sealed class EmptyActorBaseContext : IActorBaseContext
     public static readonly EmptyActorBaseContext Instance = new();
     private EmptyActorBaseContext() { }
     public IPropertySymbol? Self => null;
+    public IPropertySymbol? Sender => null;
     public IMethodSymbol? AroundPreRestart => null;
     public IMethodSymbol? AroundPreStart => null;
     public IMethodSymbol? PreStart => null;
@@ -49,6 +51,8 @@ public sealed class EmptyActorBaseContext : IActorBaseContext
 public sealed class ActorBaseContext : IActorBaseContext
 {
     private readonly Lazy<IPropertySymbol> _lazySelf;
+    private readonly Lazy<IPropertySymbol> _lazySender;
+    
     private readonly Lazy<IMethodSymbol> _lazyAroundPreRestart;
     private readonly Lazy<IMethodSymbol> _lazyAroundPreStart;
     private readonly Lazy<IMethodSymbol> _lazyPreStart;
@@ -63,7 +67,8 @@ public sealed class ActorBaseContext : IActorBaseContext
         Guard.AssertIsNotNull(context.ActorBaseType);
         
         _lazySelf = new Lazy<IPropertySymbol>(() => (IPropertySymbol) context.ActorBaseType!.GetMembers("Self").First());
-
+        _lazySender = new Lazy<IPropertySymbol>(() => (IPropertySymbol) context.ActorBaseType!.GetMembers("Sender").First());
+        
         _lazyAroundPreRestart = new Lazy<IMethodSymbol>(() => (IMethodSymbol) context.ActorBaseType!
             .GetMembers(nameof(AroundPreRestart)).First());
         _lazyAroundPreStart = new Lazy<IMethodSymbol>(() => (IMethodSymbol) context.ActorBaseType!
@@ -83,6 +88,8 @@ public sealed class ActorBaseContext : IActorBaseContext
     }
 
     public IPropertySymbol? Self => _lazySelf.Value;
+    public IPropertySymbol? Sender => _lazySender.Value;
+
     public IMethodSymbol? AroundPreRestart => _lazyAroundPreRestart.Value;
     public IMethodSymbol? AroundPreStart => _lazyAroundPreStart.Value;
     public IMethodSymbol? PreStart => _lazyPreStart.Value;

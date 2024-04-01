@@ -62,6 +62,16 @@ public static class RuleDescriptors
                        "Consider implementing the IWithTimers interface and use the Timers.StartSingleTimer() or " +
                        "Timers.StartPeriodicTimer() instead.");
 
+    public static DiagnosticDescriptor Ak1005MustCloseOverSenderWhenUsedInsideLambdaArgument { get; } = Rule(
+        id: "AK1005",
+        title: "Must close over `Sender` or `Self`", 
+        category: AnalysisCategory.ActorDesign, 
+        defaultSeverity: DiagnosticSeverity.Warning,
+        messageFormat: "When accessing `{0}` inside a lambda expression passed as an asynchronous method argument, " +
+                       "you must always close over `{0}` to ensure that the `{0}` property is captured before the " +
+                       "method is invoked, because there is no guarantee that asynchronous context will be preserved " +
+                       "when the lambda is invoked inside the method.");
+    
     public static DiagnosticDescriptor Ak1007MustNotUseIWithTimersInPreRestart { get; } = Rule(
         id: "AK1007",
         title: "Timers.StartSingleTimer() and Timers.StartPeriodicTimer() must not be used inside AroundPreRestart() or PreRestart()", 
