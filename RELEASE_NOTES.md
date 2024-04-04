@@ -1,3 +1,9 @@
+#### 0.2.4 April 4th 2024 ####
+
+* [AK1004: Add rule to suggest IWithTimers usage](https://github.com/akkadotnet/akka.analyzers/pull/81)
+* [AK1005: Add rule to detect improper use of `Sender` and `Self` inside lambda callbacks](https://github.com/akkadotnet/akka.analyzers/pull/87)
+* [AK1007: Add rule to flag use of `IWithTimers` inside PreRestart and AroundPreRestart](https://github.com/akkadotnet/akka.analyzers/pull/85)
+
 #### 0.2.3.1 March 1st 2024 ####
 
 * [Fix multi targeting default version bug](https://github.com/akkadotnet/akka.analyzers/pull/77)
