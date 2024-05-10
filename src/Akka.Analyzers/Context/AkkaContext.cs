@@ -7,6 +7,7 @@
 using Akka.Analyzers.Context.Cluster;
 using Akka.Analyzers.Context.ClusterSharding;
 using Akka.Analyzers.Context.Core;
+using Akka.Analyzers.Context.Persistence;
 using Akka.Analyzers.Context.System;
 using Microsoft.CodeAnalysis;
 
@@ -30,6 +31,7 @@ public sealed class AkkaContext
         AkkaCore = AkkaCoreContext.Get(compilation);
         AkkaCluster = AkkaClusterContext.Get(compilation);
         AkkaClusterSharding = AkkaClusterShardingContext.Get(compilation);
+        AkkaPersistence = AkkaPersistenceContext.Get(compilation);
         SystemThreadingTasks = SystemThreadingTasksContext.Get(compilation);
     }
 
@@ -62,6 +64,16 @@ public sealed class AkkaContext
     /// Does the current compilation context have Akka.Cluster.Sharding installed?
     /// </summary>
     public bool HasAkkaClusterShardingInstalled => AkkaClusterSharding != EmptyAkkaClusterShardingContext.Instance;
+    
+    /// <summary>
+    /// Symbol data and availability for Akka.Persistence.
+    /// </summary>
+    public IAkkaPersistenceContext AkkaPersistence { get; }
+    
+    /// <summary>
+    /// Does the current compilation context have Akka.Persistence installed?
+    /// </summary>
+    public bool HasAkkaPersistenceInstalled => AkkaPersistence != EmptyPersistenceContext.Instance;
     
     public ISystemThreadingTasksContext SystemThreadingTasks { get; }
 }

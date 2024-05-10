@@ -72,6 +72,14 @@ public static class RuleDescriptors
                        "method is invoked, because there is no guarantee that asynchronous context will be preserved " +
                        "when the lambda is invoked inside the method.");
     
+    public static DiagnosticDescriptor Ak1006ShouldNotUsePersistInsideLoop { get; } = Rule(
+        id: "AK1006",
+        title: "Should not call `Persist` inside a loop", 
+        category: AnalysisCategory.ActorDesign, 
+        defaultSeverity: DiagnosticSeverity.Warning,
+        messageFormat: "Calling `{0}()` inside a loop is discouraged as it is non-performant. Collect all of your " +
+                       "changes inside the loop and then call `{1}()` after the loop instead.");
+    
     public static DiagnosticDescriptor Ak1007MustNotUseIWithTimersInPreRestart { get; } = Rule(
         id: "AK1007",
         title: "Timers.StartSingleTimer() and Timers.StartPeriodicTimer() must not be used inside AroundPreRestart() or PreRestart()", 
