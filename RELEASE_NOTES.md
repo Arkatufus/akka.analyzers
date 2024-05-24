@@ -1,3 +1,7 @@
+#### 0.2.5 May 24th 2024 ####
+
+* [AK1006: Add rule to suggest `PersistAll()` usage](https://github.com/akkadotnet/akka.analyzers/pull/99)
+
 #### 0.2.4 April 4th 2024 ####
 
 * [AK1004: Add rule to suggest IWithTimers usage](https://github.com/akkadotnet/akka.analyzers/pull/81)
