@@ -1,0 +1,14 @@
+<Project>
+  <Target Name="UpdateNuSpecProperties" BeforeTargets="GenerateNuspec" >
+    <PropertyGroup>
+      <PrereleaseSuffix Condition=" '$(VersionSuffix)' != '' ">-$(VersionSuffix)</PrereleaseSuffix>
+      <PackageVersion>$(VersionPrefix)$(PrereleaseSuffix)</PackageVersion>
+      <!-- Pass through values we don't know ahead of time for any hand-crafted .nuspec files -->
+      <NuspecProperties>
+        Configuration=$(Configuration);
+        PackageVersion=$(PackageVersion);
+        Description=$(Description);
+      </NuspecProperties>
+    </PropertyGroup>
+  </Target>
+</Project>
