@@ -19,16 +19,22 @@
             major versions of Akka.NET.
         </Description>
   </PropertyGroup>
-  <PropertyGroup Label="Build">
+  <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RoslynVersion>4.8.0</RoslynVersion>
+    <MicrosoftCodeAnalysisVersion>3.11</MicrosoftCodeAnalysisVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)\logo.png" Pack="true" Visible="false" PackagePath="\" />
     <None Include="$(MSBuildThisFileDirectory)\README.md" Pack="true" Visible="false" PackagePath="\" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers"/>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp"/>
+  </ItemGroup>
+  
   <!-- ======================================== -->
   <!-- Production-specific properties and items -->
   <Choose>
@@ -49,25 +55,4 @@
       </ItemGroup>
     </When>
   </Choose>
-  <PropertyGroup Condition="$(MSBuildProjectName.StartsWith('Akka.Analyzers.Roslyn'))">
-    <AssemblyName>Akka.Analyzers</AssemblyName>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(MSBuildProjectName.StartsWith('Akka.Analyzers.Fixes.Roslyn'))">
-    <AssemblyName>Akka.Analyzers.Fixes</AssemblyName>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(MSBuildProjectName.Contains('Roslyn311'))">
-    <DefineConstants>$(DefineConstants);ROSLYN_3_11;ROSLYN_3_11_OR_GREATER</DefineConstants>
-    <RoslynVersion>3.11.0</RoslynVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(MSBuildProjectName.Contains('Roslyn44'))">
-    <DefineConstants>$(DefineConstants);ROSLYN_4_4;ROSLYN_3_11_OR_GREATER;ROSLYN_4_4_OR_GREATER</DefineConstants>
-    <RoslynVersion>4.4.0</RoslynVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(MSBuildProjectName.Contains('Roslyn46'))">
-    <DefineConstants>$(DefineConstants);ROSLYN_4_6;ROSLYN_3_11_OR_GREATER;ROSLYN_4_4_OR_GREATER;ROSLYN_4_6_OR_GREATER</DefineConstants>
-    <RoslynVersion>4.6.0</RoslynVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(RoslynVersion)' == '4.8.0' ">
-    <DefineConstants>$(DefineConstants);ROSLYN_4_8;ROSLYN_3_11_OR_GREATER;ROSLYN_4_4_OR_GREATER;ROSLYN_4_6_OR_GREATER;ROSLYN_4_8_OR_GREATER</DefineConstants>
-  </PropertyGroup>
 </Project>
