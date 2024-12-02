@@ -1,3 +1,7 @@
+#### 0.3.0-beta1 December 3rd 2024 ####
+
+* [Fix Akka.Analyzers not being able to be installed on old style .NET Framework .csproj projects](https://github.com/akkadotnet/akka.analyzers/pull/107)
+
 #### 0.2.5 May 24th 2024 ####
 
 * [AK1006: Add rule to suggest `PersistAll()` usage](https://github.com/akkadotnet/akka.analyzers/pull/99)
