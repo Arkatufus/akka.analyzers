@@ -1,5 +1,4 @@
 # Custom
-tools/
 .nuget/
 .dotnet/
 .idea/
@@ -39,7 +38,6 @@ bld/
 
 #FAKE
 .fake
-tools/
 
 #DocFx output
 _site/
