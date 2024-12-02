@@ -1,4 +1,4 @@
-#### 0.2.6-beta1 December 3rd 2024 ####
+#### 0.3.0-beta1 December 3rd 2024 ####
 
 * [Fix Akka.Analyzers not being able to be installed on old style .NET Framework .csproj projects](https://github.com/akkadotnet/akka.analyzers/pull/107)
 
